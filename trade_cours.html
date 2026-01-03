@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BTC Monthly Returns</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #121212; /* Dark background */
+            color: #e0e0e0; /* Light text */
+            margin: 20px;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #ffffff;
+        }
+        .table-container {
+            overflow-x: auto;
+            background: #1e1e1e; /* Darker container background */
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+        th, td {
+            padding: 10px;
+            text-align: center;
+            border: 1px solid #333; /* Darker borders */
+        }
+        th {
+            font-weight: 600;
+            color: #aaa;
+            background-color: #1e1e1e;
+        }
+        .year-cell {
+            font-weight: bold;
+            text-align: left;
+            padding-left: 15px;
+            background-color: #1e1e1e; /* Match container */
+            color: #fff;
+            position: sticky;
+            left: 0;
+            z-index: 1;
+            border-right: 1px solid #444;
+        }
+        .cell {
+            color: #fff; /* Text always white/light on colored cells */
+            font-weight: 500;
+            border-radius: 4px;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.5); /* Better readability on bright colors */
+        }
+        
+        /* Highlight box for Nov 2025 as in image (optional) */
+        .highlight-box {
+            border: 2px solid red !important;
+        }
+        
+        .loading {
+            text-align: center;
+            font-size: 0.9em;
+            color: #888;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>BTC Monthly Returns (%)</h1>
+    
+    <div class="table-container">
+        <table id="returns-table">
+            <thead>
+                <tr>
+                    <th>Year</th>
+                    <th>Jan</th>
+                    <th>Feb</th>
+                    <th>Mar</th>
+                    <th>Apr</th>
+                    <th>May</th>
+                    <th>Jun</th>
+                    <th>Jul</th>
+                    <th>Aug</th>
+                    <th>Sep</th>
+                    <th>Oct</th>
+                    <th>Nov</th>
+                    <th>Dec</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Rows will be inserted here -->
+            </tbody>
+        </table>
+        <div id="status" class="loading">Loading live data...</div>
+    </div>
+
+    <!--
+    Логика обновления данных с Binance:
+    1. Получаем свечи за последние 60 месяцев (чтобы обновить текущий и проверить недавние).
+    2. Вычисляем процент изменения: (Close - Open) / Open * 100.
+    3. Обновляем массив btcData и перерисовываем таблицу.
+    Если API недоступен (например, CORS), останутся старые данные.
+    -->
+
+    <!--
+    === СТАТИСТИЧЕСКАЯ ШПАРГАЛКА ПО ВХОДУ/ВЫХОДУ (на основе данных 2011-2024) ===
+
+    | Период                    | Действие            | Почему (по статистике)                                         |
+    |---------------------------|---------------------|----------------------------------------------------------------|
+    | Конец Августа - Сентябрь  | ПОКУПКА (Вход)      | Исторически худший месяц ("Кровавый сентябрь"). Лучшая цена.   |
+    | Октябрь - Ноябрь          | ДЕРЖАТЬ / ПРОДАВАТЬ | "Uptober". Часто самый сильный рост. Фиксация прибыли.         |
+    | Декабрь - Январь          | НАБЛЮДЕНИЕ          | Высокая волатильность. Фиксация года или "Ралли Санта-Клауса". |
+    | Март                      | ДОКУПКА             | Сезонная коррекция. Второй шанс на вход перед весной.          |
+    | Май - Июнь                | ОСТОРОЖНОСТЬ        | "Sell in May and go away". Часто начало летнего затишья.       |
+
+    Дисклеймер: Прошлые результаты не гарантируют будущих.
+    -->
+    <script>
+        const btcData = {
+            2025: [9.54, -17.5, -2.19, 14.2, 11.1, 2.40, 8.02, -6.43, 5.31, -3.93, -17.4, -4.26],
+            2024: [0.87, 44, 16.3, -14.7, 11.1, -7.02, 3.09, -8.73, 7.11, 11.2, 37.4, -3.19],
+            2023: [39.9, -0.01, 23.1, 3.05, -7.10, 11.9, -4.04, -11.2, 3.99, 28.5, 8.87, 11.9],
+            2022: [-16.9, 12.2, 5.51, -17.2, -15.9, -37.9, 17.7, -14, -3.10, 5.55, -16.1, -3.70],
+            2021: [14.3, 36, 30.1, -1.89, -35.4, -6.38, 19.7, 14, -7.30, 40, -7.12, -18.9],
+            2020: [29.6, -8.21, -24.9, 34.1, 9.52, -3.15, 24.2, 2.54, -7.96, 28.1, 42.9, 47.8],
+            2019: [-7.96, 10.9, 6.13, 32.4, 58.5, 27.1, -6.88, -4.66, -14, 10.5, -17.4, -4.74],
+            2018: [-28.1, 5.64, -35.1, 34.4, -18.7, -15.4, 21.1, -9.28, -5.77, -4.67, -36.4, -6.40],
+            2017: [0.70, 21.5, -9.17, 25.8, 69.6, 8.41, 15.4, 63.8, -7.72, 49, 58.9, 38.8],
+            2016: [-14.4, 18.5, -4.84, 7.57, 18.5, 26.8, -7.11, -7.87, 5.94, 14.9, 6.32, 29.2],
+            2015: [-32.1, 17.2, -3.96, -3.31, -2.44, 14.3, 8.09, -19.2, 2.52, 33.1, 19.8, 14.1],
+            2014: [9.93, -33.7, -16.9, -2.05, 39.3, 2.58, -8.60, -18.5, -19, -12.7, 11.6, -15.3],
+            2013: [49.9, 54.9, 188, 50.5, -7.19, -25, 8.80, 27.4, -1.58, 53.8, 453.9, -33.2],
+            2012: [17.5, -11.7, -0.24, 3.07, 2.91, 29.2, 40.2, 14.8, 13.1, -9.96, 15.2, 6.56],
+            2011: [73.7, 65.2, -8.61, 334.6, 157.5, 85.3, -15.9, -32.3, -44.4, -35.1, -11.5, 55]
+        };
+
+        function getColor(value) {
+            if (value === null || value === undefined) return 'transparent';
+            
+            const isPositive = value >= 0;
+            const absValue = Math.abs(value);
+            
+            // Настройка насыщенности/прозрачности для темной темы
+            // Мы хотим, чтобы цвета "выделялись" на темном фоне
+            let alpha = Math.min(absValue / 30, 0.9); // Более насыщенные цвета
+            alpha = Math.max(alpha, 0.15); // Минимальная видимость
+
+            if (isPositive) {
+                // Зеленый: #27ae60
+                return `rgba(39, 174, 96, ${alpha})`;
+            } else {
+                // Красный: #c0392b
+                return `rgba(192, 57, 43, ${alpha})`;
+            }
+        }
+
+        async function fetchLiveData() {
+            try {
+                // Публичный API Binance для свечей (monthly - klines)
+                // Пара: BTCUSDT, Интервал: 1M
+                // Берем последние 60 месяцев (5 лет), чтобы гарантировать отсутствие "дыр" 
+                // если файл откроют через год-два, и чтобы перекрыть 2025 год живыми данными.
+                const response = await fetch('https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1M&limit=60');
+                
+                if (!response.ok) {
+                    throw new Error('Ответ сети не ok');
+                }
+                
+                const data = await response.json();
+                
+                // Формат свечей Binance (kline):
+                // [
+                //   1499040000000,      // Время открытия (Open time)
+                //   "0.01634790",       // Цена открытия (Open)
+                //   "0.80000000",       // Максимум (High)
+                //   "0.01575800",       // Минимум (Low)
+                //   "0.01577100",       // Цена закрытия (Close) или текущая цена
+                //   ...
+                // ]
+
+                data.forEach(candle => {
+                    const openTime = candle[0];
+                    const openPrice = parseFloat(candle[1]);
+                    const closePrice = parseFloat(candle[4]);
+                    
+                    const date = new Date(openTime);
+                    const year = date.getFullYear();
+                    const monthIndex = date.getMonth(); // 0 = Янв, 11 = Дек
+                    
+                    if (openPrice === 0) return;
+                    
+                    const change = ((closePrice - openPrice) / openPrice) * 100;
+                    const roundedChange = Math.round(change * 100) / 100; // Округляем до 2 знаков
+
+                    if (!btcData[year]) {
+                        btcData[year] = new Array(12).fill(null);
+                    }
+                    
+                    // Обновляем структуру данных
+                    // Примечание: Это перезаписывает жестко заданные данные для полученных месяцев.
+                    // Перепроверка недавней истории - это нормально.
+                    btcData[year][monthIndex] = roundedChange;
+                });
+                
+                document.getElementById('status').textContent = 'Данные обновлены через Binance API';
+                renderTable(); // Перерисовываем таблицу с новыми данными
+
+            } catch (error) {
+                console.error('Ошибка получения данных:', error);
+                document.getElementById('status').textContent = 'Ошибка обновления (CORS/Сеть). Показаны сохраненные данные.';
+            }
+        }
+
+        function renderTable() {
+            const tbody = document.querySelector('#returns-table tbody');
+            tbody.innerHTML = ''; // Очищаем существующие строки
+            
+            const years = Object.keys(btcData).sort((a, b) => b - a);
+
+            years.forEach(year => {
+                const tr = document.createElement('tr');
+                
+                // Ячейка года
+                const tdYear = document.createElement('td');
+                tdYear.textContent = year;
+                tdYear.className = 'year-cell';
+                tr.appendChild(tdYear);
+                
+                // Ячейки месяцев
+                // Убедимся, что массив имеет 12 элементов
+                let months = btcData[year];
+                if (!months) months = new Array(12).fill(null);
+                
+                // Цикл от 0 до 11 для Янв-Дек
+                for (let i = 0; i < 12; i++) {
+                    const val = months[i];
+                    const td = document.createElement('td');
+                    
+                    if (val !== null && val !== undefined) {
+                        td.textContent = val > 0 ? `+${val}%` : `${val}%`;
+                        td.style.backgroundColor = getColor(val);
+                    } else {
+                        td.textContent = '';
+                        td.style.backgroundColor = 'transparent';
+                    }
+                    
+                    td.className = 'cell';
+                    tr.appendChild(td);
+                }
+                
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Первоначальная отрисовка
+        renderTable();
+        
+        // Получение живых данных
+        fetchLiveData();
+    </script>
+</body>
+</html>
