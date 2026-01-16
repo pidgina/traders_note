@@ -1,0 +1,21 @@
+# System files
+.DS_Store
+**/.DS_Store
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.env
+*.log
+
+# Project specific
+* copy.html
+last_prices.json
+config.json
+**/config.json
+
+# Allow config example
+!config.example.json
+!**/config.example.json

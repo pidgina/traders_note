@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BTC Monthly Closing Price (USD)</title>
+    <style>
+        :root {
+            --bg: #020617;
+            --text-main: #e5e7eb;
+            --text-muted: #9ca3af;
+            --text-strong: #f9fafb;
+            --card-radius: 20px;
+            --accent: #2563eb;
+            --good: #22c55e;
+            --bad: #ef4444;
+            --glass-bg: rgba(15, 23, 42, 0.8);
+            --glass-border: rgba(148, 163, 184, 0.15);
+        }
+
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", Roboto, sans-serif;
+            background: radial-gradient(circle at top, #020617 0, #020617 45%, #020617 100%);
+            color: var(--text-main);
+            min-height: 100vh;
+        }
+
+        .app-shell {
+            max-width: 1240px;
+            margin: 0 auto;
+            background: radial-gradient(circle at top left, rgba(56,189,248,0.07), transparent 60%), 
+                        radial-gradient(circle at top right, rgba(167,139,250,0.09), transparent 60%), 
+                        linear-gradient(160deg, rgba(15,23,42,0.92), rgba(2,6,23,0.96));
+            border-radius: 28px;
+            padding: 24px;
+            box-shadow: 0 26px 110px rgba(0,0,0,0.9), 0 0 0 1px var(--glass-border);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .app-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding: 16px 20px;
+            border-radius: 20px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(20px);
+            box-shadow: 0 20px 40px -10px rgba(0,0,0,0.5);
+        }
+
+        h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin: 0;
+            color: var(--text-strong);
+            letter-spacing: -0.02em;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            background: var(--glass-bg);
+            padding: 20px;
+            border-radius: 20px;
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            font-size: 14px;
+        }
+
+        th, td {
+            padding: 12px 8px;
+            text-align: center;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        th {
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-size: 11px;
+            letter-spacing: 0.05em;
+            padding-bottom: 16px;
+        }
+
+        .year-cell {
+            font-weight: 700;
+            text-align: left;
+            padding-left: 15px;
+            color: var(--text-strong);
+            position: sticky;
+            left: 0;
+            z-index: 10;
+            background: #111827;
+            border-right: 1px solid var(--glass-border);
+        }
+
+        .cell {
+            color: #fff;
+            font-weight: 500;
+            border-radius: 6px;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+            transition: transform 0.2s;
+        }
+
+        .cell:hover {
+            transform: scale(1.05);
+            z-index: 2;
+        }
+
+        .loading {
+            text-align: center;
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-top: 16px;
+            font-style: italic;
+        }
+
+        /* Nav links */
+        .nav-links {
+            display: flex;
+            gap: 12px;
+        }
+        .nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            padding: 6px 12px;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+        .nav-links a:hover {
+            color: var(--text-strong);
+            background: rgba(255,255,255,0.05);
+        }
+        .nav-links a.active {
+            color: var(--accent);
+            background: rgba(37,99,235,0.1);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-shell">
+        <header class="app-header">
+            <h1>Изменения BTC по месяцам</h1>
+            <nav class="nav-links">
+                <a href="trade_cours.html">Returns</a>
+                <a href="trade_price.html" class="active">Price</a>
+            </nav>
+        </header>
+        
+        <div class="table-container">
+            <table id="price-table">
+                <thead>
+                    <tr>
+                        <th>Year</th>
+                        <th>Jan</th>
+                        <th>Feb</th>
+                        <th>Mar</th>
+                        <th>Apr</th>
+                        <th>May</th>
+                        <th>Jun</th>
+                        <th>Jul</th>
+                        <th>Aug</th>
+                        <th>Sep</th>
+                        <th>Oct</th>
+                        <th>Nov</th>
+                        <th>Dec</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Rows will be inserted here -->
+                </tbody>
+            </table>
+            <div id="status" class="loading">Loading live data...</div>
+        </div>
+    </div>
+
+    <!--
+    Логика обновления данных с Binance:
+    1. Получаем свечи за все время (или максимально доступное).
+    2. Берем цену закрытия (Close price) каждой свечи.
+    3. Заполняем таблицу.
+    -->
+    <script>
+        // Инициализируем пустой объект, будем заполнять его данными с Binance
+        // Структура: { 2024: [priceJan, priceFeb, ...], ... }
+        const btcPrices = {};
+
+        function formatPrice(price) {
+            if (price === null || price === undefined) return '';
+            // Форматируем цену: если < 1000, показываем как есть, иначе с разделителями тысяч
+            // Округляем до целых для экономии места, если цена большая
+            if (price >= 1000) {
+                return Math.round(price).toLocaleString('en-US');
+            }
+            return price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        async function fetchAllData() {
+            try {
+                // Публичный API Binance для свечей (monthly - klines)
+                // Пара: BTCUSDT, Интервал: 1M
+                // limit=1000 (максимум) хватит на ~83 года, так что получим всю историю с 2017 (на Binance)
+                // Для более ранней истории (2011-2017) придется захардкодить или искать другой источник.
+                // Binance запустился в 2017. 
+                // Я добавлю хардкод для 2011-2017 (примерные цены закрытия с CoinGecko/других источников).
+                
+                // Хардкод исторических данных (примерные цены закрытия месяца)
+                // Источник: исторические данные (CoinMarketCap / Investing)
+                
+                const historicalData = {
+                    2011: [0.5, 0.9, 0.8, 3.5, 8.9, 16.4, 13.4, 8.2, 5.1, 3.3, 3.0, 4.7],
+                    2012: [5.5, 4.9, 4.9, 5.1, 5.2, 6.7, 9.4, 10.1, 12.4, 11.2, 12.6, 13.5],
+                    2013: [20.4, 33.4, 93.0, 139, 129, 97.5, 106, 140, 137, 211, 1002, 754], // Ноябрь 2013 пик ~1100, закрытие ~1000
+                    2014: [816, 546, 453, 450, 626, 640, 587, 477, 386, 337, 376, 318],
+                    2015: [216, 253, 243, 235, 229, 262, 283, 229, 235, 312, 376, 430],
+                    2016: [368, 437, 415, 449, 530, 672, 623, 574, 608, 699, 742, 963],
+                    2017: [966, 1189, 1079, 1349, 2286, 2480, 2873, 4700] // До августа 2017 (Binance start)
+                };
+
+                // Заполняем хардкодом
+                for (const year in historicalData) {
+                    btcPrices[year] = historicalData[year];
+                }
+
+                // Получаем данные с Binance (с августа 2017 по настоящее время)
+                const response = await fetch('https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1M&limit=1000');
+                
+                if (!response.ok) {
+                    throw new Error('Ответ сети не ok');
+                }
+                
+                const data = await response.json();
+                
+                data.forEach(candle => {
+                    const openTime = candle[0];
+                    const closePrice = parseFloat(candle[4]);
+                    
+                    const date = new Date(openTime);
+                    const year = date.getFullYear();
+                    const monthIndex = date.getMonth(); // 0 = Янв, 11 = Дек
+                    
+                    if (!btcPrices[year]) {
+                        btcPrices[year] = new Array(12).fill(null);
+                    }
+                    
+                    // Записываем цену закрытия
+                    btcPrices[year][monthIndex] = closePrice;
+                });
+                
+                document.getElementById('status').textContent = 'Данные обновлены (2011-2017: Архив, 2017+: Binance API)';
+                renderTable();
+
+            } catch (error) {
+                console.error('Ошибка получения данных:', error);
+                document.getElementById('status').textContent = 'Ошибка обновления. Проверьте консоль.';
+            }
+        }
+
+        function renderTable() {
+            const tbody = document.querySelector('#price-table tbody');
+            tbody.innerHTML = ''; // Очищаем существующие строки
+            
+            const years = Object.keys(btcPrices).sort((a, b) => b - a);
+
+            years.forEach(year => {
+                const tr = document.createElement('tr');
+                
+                // Ячейка года
+                const tdYear = document.createElement('td');
+                tdYear.textContent = year;
+                tdYear.className = 'year-cell';
+                tr.appendChild(tdYear);
+                
+                // Ячейки месяцев
+                let months = btcPrices[year];
+                if (!months) months = new Array(12).fill(null);
+                
+                // Цикл от 0 до 11 для Янв-Дек
+                for (let i = 0; i < 12; i++) {
+                    const val = months[i];
+                    const td = document.createElement('td');
+                    
+                    if (val !== null && val !== undefined) {
+                        td.textContent = `$${formatPrice(val)}`;
+                        // Можно добавить легкую расцветку фона в зависимости от цены (тепловая карта цен),
+                        // но для абсолютных цен это сложно (экспоненциальный рост).
+                        // Оставим просто темный фон или сделаем градиент по годам? 
+                        // Пока просто прозрачный.
+                        td.style.backgroundColor = 'rgba(255, 255, 255, 0.05)';
+                    } else {
+                        td.textContent = '';
+                    }
+                    
+                    td.className = 'cell';
+                    tr.appendChild(td);
+                }
+                
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Запуск
+        fetchAllData();
+    </script>
+</body>
+</html>
+
