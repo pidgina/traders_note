@@ -19,3 +19,4 @@ config.json
 # Allow config example
 !config.example.json
 !**/config.example.json
+crypto_portfolio_backup (1).json
