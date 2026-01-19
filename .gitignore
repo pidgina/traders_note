@@ -20,3 +20,4 @@ config.json
 !config.example.json
 !**/config.example.json
 crypto_portfolio_backup (1).json
+trade_local — копия.html

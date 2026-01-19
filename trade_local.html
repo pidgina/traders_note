@@ -61,18 +61,18 @@
 
         body {
             margin: 0;
-            padding: 20px;
+            padding: 10px;
             font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", Roboto, sans-serif;
             background: radial-gradient(circle at top, #020617 0, #020617 45%, #020617 100%);
             color: var(--text-main);
         }
 
         .app-shell {
-            max-width: 1240px;
+            max-width: 1440px;
             margin: 0 auto;
             background: radial-gradient(circle at top left, rgba(56,189,248,0.07), transparent 60%), radial-gradient(circle at top right, rgba(167,139,250,0.09), transparent 60%), radial-gradient(circle at bottom, rgba(34,197,94,0.05), transparent 60%), linear-gradient(160deg, rgba(15,23,42,0.92), rgba(2,6,23,0.96));
             border-radius: 28px;
-            padding: 22px 22px 24px;
+            padding: 14px 14px 18px;
             box-shadow: 0 26px 110px rgba(0,0,0,0.9), 0 0 0 1px rgba(148,163,184,0.25);
             position: relative;
             overflow: hidden;
@@ -284,6 +284,21 @@
             color: #ffe4e6;
         }
 
+        .header-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .header-actions .btn-main,
+        .header-actions .btn-ghost {
+            width: 100%;
+            justify-content: center;
+            height: 32px;
+        }
+
         /* Nav links */
         .nav-links {
             display: flex;
@@ -318,8 +333,8 @@
 
         .layout {
             display: grid;
-            grid-template-columns: minmax(0, 1.8fr) minmax(0, 1fr);
-            gap: 16px;
+            grid-template-columns: minmax(0, 2.1fr) minmax(260px, 0.9fr);
+            gap: 12px;
         }
 
         .card {
@@ -336,7 +351,7 @@
         }
 
         .card--watchlist {
-            min-height: 360px;
+            align-self: start;
         }
 
         .card::before {
@@ -452,6 +467,11 @@
             overflow: hidden;
         }
 
+        .table-wrap--watchlist table thead th,
+        .table-wrap--watchlist table tbody td {
+            padding: 4px 4px;
+        }
+
         .table-wrap--watchlist table {
             min-width: 100%;
         }
@@ -553,8 +573,8 @@
         }
 
         .btn-icon {
-            width: 24px;
-            height: 24px;
+            width: 30px;
+            height: 30px;
             border-radius: 999px;
             border: 1px solid rgba(55,65,81,1);
             background: radial-gradient(circle at top, rgba(30,64,175,0.5), rgba(15,23,42,0.95));
@@ -562,15 +582,22 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 13px;
+            font-size: 16px;
             cursor: pointer;
             box-shadow: 0 8px 18px rgba(15,23,42,1);
+            transition: all 0.2s;
+        }
+
+        .btn-icon:hover {
+            transform: scale(1.1);
+            border-color: rgba(59, 130, 246, 0.5);
+            color: #fff;
         }
 
         .btn-icon--small {
-            width: 20px;
-            height: 20px;
-            font-size: 11px;
+            width: 24px;
+            height: 24px;
+            font-size: 13px;
             box-shadow: 0 6px 14px rgba(15,23,42,0.9);
         }
 
@@ -686,7 +713,7 @@
 
         .cell-symbol select,
         .cell-symbol input {
-            width: 90px;
+            width: 55px;
             padding: 3px 6px;
             border-radius: 8px;
             border: 1px solid rgba(55,65,81,1);
@@ -697,7 +724,7 @@
 
         .cell-price {
             white-space: nowrap;
-            width: 120px;
+            width: 90px;
         }
 
         .cell-price span {
@@ -705,11 +732,11 @@
         }
 
         .watchlist-table .watchlist-col-symbol {
-            width: 90px;
+            width: 55px;
         }
 
         .watchlist-table .watchlist-col-price {
-            width: 130px;
+            width: 90px;
         }
 
         .price-manual-label {
@@ -718,7 +745,7 @@
         }
 
         .inline-input-compact {
-            width: 84px;
+            width: 65px;
             padding: 3px 5px;
             border-radius: 8px;
             border: 1px solid rgba(55,65,81,1);
@@ -979,8 +1006,8 @@
         }
 
         .btn-lock {
-            width: 22px;
-            height: 22px;
+            width: 24px;
+            height: 24px;
             border-radius: 6px;
             border: 1px solid rgba(148, 163, 184, 0.2);
             background: rgba(15, 23, 42, 0.6);
@@ -988,7 +1015,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 14px;
+            font-size: 15px;
             cursor: pointer;
             margin-left: 8px;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -1036,7 +1063,7 @@
                 <div class="app-title-wrap">
                     <div class="app-title">
                         Заметки трейдера
-                        <span class="app-title-badge">local edition</span>
+                        <span class="app-title-badge">локальная версия</span>
                     </div>
                     <div class="app-subtitle">
                         <div>Все данные хранятся в браузере. Не удаляйте cookies и не очищайте кэш браузера.</div>
@@ -1056,14 +1083,16 @@
                     <span class="pill-label">состояние</span>
                     <span class="pill-value" id="session-status">локально</span>
                 </div>
-                <button class="btn-main" id="add-position-btn">
-                    <span class="icon">＋</span>
-                    <span>Новая сделка</span>
-                </button>
-                <button class="btn-ghost" id="add-watch-btn">
-                    <span class="icon">★</span>
-                    <span>Добавить в план</span>
-                </button>
+                <div class="header-actions">
+                    <button class="btn-main" id="add-position-btn">
+                        <span class="icon">＋</span>
+                        <span>Новая сделка</span>
+                    </button>
+                    <button class="btn-ghost" id="add-watch-btn">
+                        <span class="icon">★</span>
+                        <span>Добавить в план</span>
+                    </button>
+                </div>
             </div>
         </header>
 
@@ -1075,7 +1104,6 @@
                         <div class="card-title-wrap">
                             <div class="card-title">
                                 Портфель
-                                <span class="card-title-pill">фиксируем сделки</span>
                             </div>
                             <div class="card-subtitle">
                                 Всего вложено: <span id="total-invested">0</span> USDT · Чистая прибыль: <span id="total-pnl">0</span> USDT
@@ -1090,9 +1118,6 @@
                             <div class="inline-stat">
                                 ROI:
                                 <span class="value" id="total-roi">0.00%</span>
-                            </div>
-                            <div class="inline-tag">
-                                Реальный учёт · локально
                             </div>
                         </div>
                     </div>
@@ -1154,10 +1179,9 @@
                         <div class="card-title-wrap">
                             <div class="card-title">
                                 Курсы валют
-                                <span class="card-title-pill">Уровни интереса</span>
                             </div>
                             <div class="card-subtitle">
-                                Отслеживай уровни входа, цели по монетам.
+                                Добавляй монеты для отслеживания цены и вложения в блок "портфель" по клику.
                             </div>
                         </div>
                         <div class="card-toolbar">
@@ -1203,14 +1227,6 @@
 
                     <div class="watchlist-note">
                         Не забывайте обновлять цены, они не обновляются автоматически.
-                    </div>
-
-                    <div class="mobile-only" style="margin-top:4px;font-size:10px;color:var(--text-soft);">
-                        На мобильных устройствах таблицы можно скроллить по горизонтали.
-                    </div>
-
-                    <div class="history-log" id="action-log">
-                        <div class="history-log-entry">История действий появится здесь.</div>
                     </div>
                 </div>
             </section>
@@ -1875,9 +1891,8 @@
     function validatePosition(position) {
         const errors = [];
         
-        if (!position.symbol || !normalizeSymbolInput(position.symbol)) {
-            errors.push('Символ монеты обязателен');
-        }
+        // Убираем обязательную проверку символа при создании, 
+        // так как мы разрешаем добавлять пустую строку для заполнения
         
         if (position.buyPrice < 0) {
             errors.push('Цена покупки не может быть отрицательной');
@@ -1901,7 +1916,7 @@
     function addPosition(initial = {}) {
         const position = {
             id: Date.now().toString(36) + Math.random().toString(36).slice(2),
-            symbol: normalizeSymbolInput(initial.symbol) || 'BTC',
+            symbol: normalizeSymbolInput(initial.symbol) || '',
             buyPrice: Math.max(0, Number(initial.buyPrice) || 0),
             amount: Math.max(0, Number(initial.amount) || 0),
             sellPrice: Math.max(0, Number(initial.sellPrice) || 0),
@@ -1969,7 +1984,9 @@
     }
 
     async function refreshWatchItemPrice(item, showLoading = true) {
-        const symbol = item.symbol || 'BTC';
+        const symbol = item.symbol;
+        if (!symbol) return false;
+        
         const row = document.getElementById(`watch-row-${item.id}`);
         const priceSpan = row?.querySelector('.cell-price span');
         
@@ -2066,11 +2083,11 @@
                 symbolTd.className = 'cell-symbol';
 
                 const symbolInput = document.createElement('input');
-                symbolInput.value = item.symbol || 'BTC';
+                symbolInput.value = item.symbol || '';
                 symbolInput.addEventListener('change', () => {
                     const normalized = normalizeSymbolInput(symbolInput.value);
                     if (!normalized) {
-                        symbolInput.value = item.symbol || 'BTC';
+                        symbolInput.value = item.symbol || '';
                         showNotification('Символ монеты не может быть пустым', 'error');
                         return;
                     }
@@ -2078,7 +2095,7 @@
                     // Проверка на дубликаты
                     const duplicate = watchlist.find(w => w.id !== item.id && w.symbol === normalized);
                     if (duplicate) {
-                        symbolInput.value = item.symbol || 'BTC';
+                        symbolInput.value = item.symbol || '';
                         showNotification(`Монета ${normalized} уже есть в списке`, 'error');
                         return;
                     }
@@ -2184,17 +2201,17 @@
     }
 
     function addWatchItem(initial = {}) {
-        const normalizedSymbol = normalizeSymbolInput(initial.symbol) || 'BTC';
+        const normalizedSymbol = normalizeSymbolInput(initial.symbol);
         
-        // Проверка на дубликаты
-        if (watchlist.some(w => w.symbol === normalizedSymbol)) {
+        // Проверка на дубликаты (только если символ не пустой)
+        if (normalizedSymbol && watchlist.some(w => w.symbol === normalizedSymbol)) {
             showNotification(`Монета ${normalizedSymbol} уже есть в списке отслеживания`, 'info');
             return;
         }
         
         const item = {
             id: Date.now().toString(36) + Math.random().toString(36).slice(2),
-            symbol: normalizedSymbol,
+            symbol: normalizedSymbol || '',
             manualPrice: Math.max(0, parseFloat(initial.manualPrice) || 0),
             lastPrice: null
         };
@@ -2205,17 +2222,7 @@
             const input = document.querySelector(`#watch-row-${item.id} .cell-symbol input`);
             if (input) input.focus();
         });
-        showNotification(`Добавлена монета ${item.symbol} в отслеживание`, 'success');
-    }
-
-    function renderActionLog() {
-        const container = document.getElementById('action-log');
-        if (!container) return;
-        container.innerHTML = '';
-        const div = document.createElement('div');
-        div.className = 'history-log-entry';
-        div.textContent = 'Журнал действий отключен.';
-        container.appendChild(div);
+        showNotification(item.symbol ? `Добавлена монета ${item.symbol}` : 'Добавлена новая строка', 'success');
     }
 
     function applyPriceModeUI() {
@@ -2328,7 +2335,6 @@
 
         renderPortfolio();
         renderWatchlist();
-        renderActionLog();
         initPriceModeSwitch();
         initBackup();
 
@@ -2340,11 +2346,11 @@
         }
 
         document.getElementById('add-position-btn').addEventListener('click', () => {
-            addPosition({ symbol: 'BTC' });
+            addPosition({ symbol: '' });
         });
 
         document.getElementById('add-watch-btn').addEventListener('click', () => {
-            addWatchItem({ symbol: 'BTC' });
+            addWatchItem({ symbol: '' });
         });
 
     }
