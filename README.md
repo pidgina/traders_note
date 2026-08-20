@@ -2,6 +2,13 @@
 
 Простой и мощный инструмент для мониторинга криптовалютного портфеля, работающий полностью в вашем браузере. Все данные хранятся локально и никуда не передаются.
 
+<img width="1237" height="776" alt="Снимок экрана — 2026-08-20 в 10 17 24" src="https://github.com/user-attachments/assets/d8a910a3-07a8-4eb4-96c6-54928feddc02" />
+<img width="1238" height="762" alt="Снимок экрана — 2026-08-20 в 10 17 40" src="https://github.com/user-attachments/assets/efc80431-c7bc-4a72-b599-1cb466f2b820" />
+<img width="421" height="716" alt="Снимок экрана — 2026-08-20 в 10 17 55" src="https://github.com/user-attachments/assets/cd1ec609-577e-473d-bc31-774a996b30ff" />
+<img width="1225" height="146" alt="Снимок экрана — 2026-08-20 в 10 18 17" src="https://github.com/user-attachments/assets/e1e3f050-4be9-4f75-a93d-0d9809f18d5e" />
+<img width="749" height="169" alt="Снимок экрана — 2026-08-20 в 10 18 25" src="https://github.com/user-attachments/assets/200f0ab5-83c1-4773-80c4-c557e763572f" />
+
+
 ---
 
 ## 🚀 Основные возможности
